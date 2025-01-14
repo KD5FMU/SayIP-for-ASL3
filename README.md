@@ -28,7 +28,7 @@ chmod +x asl3_sayip_reboot_halt.sh
 
 Now that the file is executable we can go ahead and run the script file to install these features.
 ```
-sudo ./asl3_sayip_reboot_halt.sh YOUR_NODENUMBER
+sudo ./asl3_sayip_reboot_halt.sh YOUR_NODE_NUMBER
 ```
 
 # Operation
