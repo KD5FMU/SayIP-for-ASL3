@@ -16,7 +16,7 @@ Here is a wonderful script from the brain of Jory Pratt - W5GLE to get your AllS
 Here is how to install it.
 First lets go to the root
 ```
-cd ~
+cd 
 ```
 Now lets down the intaller script file.
 ```
