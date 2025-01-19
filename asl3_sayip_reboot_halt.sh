@@ -29,7 +29,7 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-NODE=$1
+NODE_NUMBER=$1
 
 CONF_FILE="/etc/asterisk/rpt.conf"
 BASE_URL="https://dev.gentoo.org/~anarchy/asl3-scripts"
@@ -109,10 +109,10 @@ fi
 
 cp "$CONF_FILE" "${CONF_FILE}.bak"
 sed -i "/\\[functions\\]/a \\
-A1 = cmd,/etc/asterisk/local/sayip.sh $NODE \\
-A3 = cmd,/etc/asterisk/local/saypublicip.sh $NODE \\
-B1 = cmd,/etc/asterisk/local/halt.sh $NODE \\
-B3 = cmd,/etc/asterisk/local/reboot.sh $NODE \\
+A1 = cmd,/etc/asterisk/local/sayip.sh $NODE_NUMBER \\
+A3 = cmd,/etc/asterisk/local/saypublicip.sh $NODE_NUMBER \\
+B1 = cmd,/etc/asterisk/local/halt.sh $NODE_NUMBER \\
+B3 = cmd,/etc/asterisk/local/reboot.sh $NODE_NUMBER \\
 " "$CONF_FILE"
 
-echo "ASL3 now has support for sayip/reboot/halt configured for node $NODE..."
+echo "ASL3 now has support for sayip/reboot/halt configured for node $NODE_NUMBER..."
