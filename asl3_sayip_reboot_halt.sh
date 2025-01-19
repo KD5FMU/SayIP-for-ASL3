@@ -65,7 +65,7 @@ cat <<EOF > /etc/asterisk/local/allstar.env
 #!/bin/sh
 
 # defines the primary node (node) number
-export NODE=$NODE
+export NODE=$NODE_NUMBER
 
 # Defines saying of local IP address at boot (enabled or disabled)
 # Default: "enabled"
