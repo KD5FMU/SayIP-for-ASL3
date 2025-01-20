@@ -87,7 +87,7 @@ fi
 
 if [ \"\$(echo \"\${SAY_IP_AT_BOOT}\" | tr \"[:upper:]\" \"[:lower:]\")\" = \"enabled\" ]; then
     sleep 12
-    /etc/asterisk/local/sayip.sh \"$NODE\"
+    /etc/asterisk/local/sayip.sh \"\$NODE\"
 fi
 "
 
