@@ -1,10 +1,12 @@
 #!/bin/sh -e
 
-# This script installs all needed files for sayip/saypublicip/halt/reboot
-# It will also create and modify /etc/rc.local so the IP is announced
-# upon system boot.
+# Enhanced script for configuring sayip/reboot/halt for AllStar Link (ASL3)
 # Copyright (C) 2024 Jory A. Pratt - W5GLE
 # Released under the GNU General Public License v2 or later.
+
+LOG_FILE="/var/log/asl3_setup.log"
+touch "$LOG_FILE"
+exec >> "$LOG_FILE" 2>&1
 
 # Ensure the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
@@ -19,6 +21,11 @@ if [ "$#" -ne 1 ]; then
 fi
 
 NODE_NUMBER=$1
+if ! echo "$NODE_NUMBER" | grep -qE '^[0-9]+$'; then
+    echo "Error: NodeNumber must be a positive integer."
+    exit 1
+fi
+
 CONF_FILE="/etc/asterisk/rpt.conf"
 BASE_URL="https://dev.gentoo.org/~anarchy/asl3-scripts"
 TARGET_DIR="/etc/asterisk/local"
@@ -37,9 +44,14 @@ cd "$TARGET_DIR" || {
 }
 
 for FILE in $FILES_TO_DOWNLOAD; do
-    if ! curl -s -O "$BASE_URL/$FILE"; then
-        echo "Failed to download $FILE"
-        exit 1
+    if [ ! -f "$FILE" ]; then
+        echo "Downloading $FILE..."
+        if ! curl -s -O "$BASE_URL/$FILE"; then
+            echo "Failed to download $FILE"
+            exit 1
+        fi
+    else
+        echo "$FILE already exists, skipping download."
     fi
 done
 
@@ -49,7 +61,9 @@ chmod 640 *.ulaw
 chown root:asterisk *.sh *.ulaw 2>/dev/null || echo "Unable to set ownership (run as root for this step)"
 
 # Create the environment configuration file
-cat <<EOF > /etc/asterisk/local/allstar.env
+ENV_FILE="/etc/asterisk/local/allstar.env"
+if [ ! -f "$ENV_FILE" ]; then
+    cat <<EOF > "$ENV_FILE"
 #!/bin/sh
 
 # Defines the primary node (node) number
@@ -59,23 +73,23 @@ export NODE=$NODE_NUMBER
 # Default: "enabled"
 export SAY_IP_AT_BOOT="enabled"
 EOF
-
-chown root:root /etc/asterisk/local/allstar.env
-chmod 755 /etc/asterisk/local/allstar.env
+    chown root:root "$ENV_FILE"
+    chmod 755 "$ENV_FILE"
+else
+    echo "$ENV_FILE already exists, skipping creation."
+fi
 
 # Ensure /etc/rc.local exists and starts with the shebang
-if [ ! -f /etc/rc.local ]; then
-    echo "#!/bin/sh -e" > /etc/rc.local
-    chmod +x /etc/rc.local
+RC_LOCAL="/etc/rc.local"
+if [ ! -f "$RC_LOCAL" ]; then
+    echo "Creating $RC_LOCAL..."
+    echo "#!/bin/sh -e" > "$RC_LOCAL"
+    chmod +x "$RC_LOCAL"
 fi
 
 # Add content to /etc/rc.local directly after the shebang
-if ! grep -q "Source the AllStar variables" /etc/rc.local; then
-    if ! head -n 1 /etc/rc.local | grep -q "^#!/bin/sh -e"; then
-        sed -i "1i#!/bin/sh -e" /etc/rc.local
-    fi
-
-    # Use a here document to safely append multi-line content
+if ! grep -q "Source the AllStar variables" "$RC_LOCAL"; then
+    echo "Adding configuration to $RC_LOCAL..."
     temp_content=$(mktemp)
     cat <<'RCLOCAL' > "$temp_content"
 # Source the AllStar variables
@@ -91,21 +105,29 @@ if [ "$(echo "${SAY_IP_AT_BOOT}" | tr "[:upper:]" "[:lower:]")" = "enabled" ]; t
     sleep 12
     /etc/asterisk/local/sayip.sh "$NODE"
 fi
-
 RCLOCAL
-
-    # Insert the content directly after the shebang
-    sed -i "2r $temp_content" /etc/rc.local
+    sed -i "2r $temp_content" "$RC_LOCAL"
     rm "$temp_content"
+else
+    echo "Configuration already exists in $RC_LOCAL, skipping modification."
 fi
 
 # Backup and modify the configuration file
-cp "$CONF_FILE" "${CONF_FILE}.bak"
-sed -i "/\[functions\]/a \\
+if ! grep -q "cmd,/etc/asterisk/local/sayip.sh" "$CONF_FILE"; then
+    echo "Backing up and modifying $CONF_FILE..."
+    cp "$CONF_FILE" "${CONF_FILE}.bak"
+    sed -i "/\[functions\]/a \\
 A1 = cmd,/etc/asterisk/local/sayip.sh $NODE_NUMBER \\
 A3 = cmd,/etc/asterisk/local/saypublicip.sh $NODE_NUMBER \\
 B1 = cmd,/etc/asterisk/local/halt.sh $NODE_NUMBER \\
 B3 = cmd,/etc/asterisk/local/reboot.sh $NODE_NUMBER \\
 " "$CONF_FILE"
+else
+    echo "Commands already exist in $CONF_FILE, skipping modification."
+fi
 
-echo "ASL3 support for sayip/reboot/halt is configured for node $NODE_NUMBER."
+# Redirect final output to terminal (stdout)
+{
+    echo "ASL3 support for sayip/reboot/halt is configured for node $NODE_NUMBER."
+    echo "Logs can be found in $LOG_FILE."
+} > /dev/tty
