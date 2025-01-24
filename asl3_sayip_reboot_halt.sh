@@ -56,6 +56,7 @@ cat <<EOF > /etc/asterisk/local/allstar.env
 export NODE=$NODE_NUMBER
 
 # Enable saying the local IP address at boot
+# Default: "enabled"
 export SAY_IP_AT_BOOT="enabled"
 EOF
 
