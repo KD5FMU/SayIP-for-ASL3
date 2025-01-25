@@ -4,7 +4,7 @@
 Here is an ASL3 Script to Speak the IP at BootUp
 
 
-Here is a wonderful script from the brain of Jory Pratt - W5GLE to get your AllStarLink V3 AllStar Node to speak it's IP address. It will speak the Local IP or Public IP address. It will also reboot or halt your node with the correct DTMF Command. Some of our verteran HamVoIP users that have migrated to ASL3. Thank You Jory for this wonderful addition to our journey. 
+Here is a wonderful script from the brain of Jory Pratt - W5GLE to get your AllStarLink V3 AllStar Node to speak it's IP address. It will speak the Local IP or Public IP address. It will also reboot or halt your node with the correct DTMF Command. Some of our verteran HamVoIP users that have migrated to ASL3. Thank You Jory for this wonderful addition to our journey. If for any reason you run into any issues please provide the info from the log file located at /var/log/asl3_sayip_setup.log
 
 - [Installation](#installation) 
 - [Operation](#operation)
