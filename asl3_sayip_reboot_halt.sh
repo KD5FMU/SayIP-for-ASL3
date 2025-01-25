@@ -4,7 +4,7 @@
 # Copyright (C) 2024 Jory A. Pratt - W5GLE
 # Released under the GNU General Public License v2 or later.
 
-LOG_FILE="/var/log/asl3_setup.log"
+LOG_FILE="/var/log/asl3_sayip_setup.log"
 touch "$LOG_FILE"
 exec >> "$LOG_FILE" 2>&1
 
