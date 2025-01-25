@@ -105,6 +105,8 @@ if [ "$(echo "${SAY_IP_AT_BOOT}" | tr "[:upper:]" "[:lower:]")" = "enabled" ]; t
     sleep 12
     /etc/asterisk/local/sayip.sh "$NODE"
 fi
+
+
 RCLOCAL
     sed -i "2r $temp_content" "$RC_LOCAL"
     rm "$temp_content"
