@@ -79,9 +79,9 @@ else
     echo "$ENV_FILE already exists, skipping creation."
 fi
 
+# Ensure /etc/rc.local exists and starts with the shebang
 RC_LOCAL="/etc/rc.local"
 
-# Ensure /etc/rc.local exists and starts with the shebang
 if [ ! -f "$RC_LOCAL" ]; then
     echo "Creating $RC_LOCAL..."
     echo "#!/bin/sh -e" > "$RC_LOCAL"
@@ -129,7 +129,6 @@ fi
 if [ "$(tail -n 1 "$RC_LOCAL")" != "" ]; then
     echo "" >> "$RC_LOCAL"
 fi
-
 
 # Backup and modify the configuration file
 if ! grep -q "cmd,/etc/asterisk/local/sayip.sh" "$CONF_FILE"; then
