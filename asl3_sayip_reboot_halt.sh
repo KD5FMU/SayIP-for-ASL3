@@ -81,17 +81,19 @@ fi
 
 # Ensure /etc/rc.local exists and starts with the shebang
 RC_LOCAL="/etc/rc.local"
+
 if [ ! -f "$RC_LOCAL" ]; then
     echo "Creating $RC_LOCAL..."
     echo "#!/bin/sh -e" > "$RC_LOCAL"
     chmod +x "$RC_LOCAL"
 fi
 
-# Add content to /etc/rc.local directly after the shebang
+# Check if the content is already in the file
 if ! grep -q "Source the AllStar variables" "$RC_LOCAL"; then
     echo "Adding configuration to $RC_LOCAL..."
-    temp_content=$(mktemp)
-    cat <<'RCLOCAL' > "$temp_content"
+
+    # Create the new content
+    new_content=$(cat <<'RCLOCAL'
 # Source the AllStar variables
 if [ -f /etc/asterisk/local/allstar.env ]; then
     . /etc/asterisk/local/allstar.env
@@ -105,11 +107,27 @@ if [ "$(echo "${SAY_IP_AT_BOOT}" | tr "[:upper:]" "[:lower:]")" = "enabled" ]; t
     sleep 12
     /etc/asterisk/local/sayip.sh "$NODE"
 fi
+
 RCLOCAL
-    sed -i "2r $temp_content" "$RC_LOCAL"
-    rm "$temp_content"
+    )
+
+    # Insert the content directly after the shebang
+    temp_file=$(mktemp)
+    {
+        head -n 1 "$RC_LOCAL"     # Copy the shebang
+        echo "$new_content"       # Add the new content
+        tail -n +2 "$RC_LOCAL"    # Add the rest of the original file
+    } > "$temp_file"
+
+    # Replace the original file with the modified one
+    mv "$temp_file" "$RC_LOCAL"
 else
     echo "Configuration already exists in $RC_LOCAL, skipping modification."
+fi
+
+# Ensure there is a blank line at the end of the file
+if [ "$(tail -n 1 "$RC_LOCAL")" != "" ]; then
+    echo "" >> "$RC_LOCAL"
 fi
 
 # Backup and modify the configuration file
