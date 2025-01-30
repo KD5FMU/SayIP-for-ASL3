@@ -43,8 +43,8 @@ sudo ./asl3_sayip_reboot_halt.sh YOUR_NODE_NUMBER
 ```
 If you do not wish to have your node speak its Local IP address upon boot you can simply disable it
 ```
-sudo nano -w /etc/asterisk/local/allstar.env 
-```
+sudo systemctl disable allstar-sayip``
+````
 
 
 
