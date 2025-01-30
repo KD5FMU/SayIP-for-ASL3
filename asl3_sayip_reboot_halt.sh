@@ -60,75 +60,23 @@ chmod 750 *.sh
 chmod 640 *.ulaw
 chown root:asterisk *.sh *.ulaw 2>/dev/null || echo "Unable to set ownership (run as root for this step)"
 
-# Create the environment configuration file
-ENV_FILE="/etc/asterisk/local/allstar.env"
-if [ ! -f "$ENV_FILE" ]; then
-    cat <<EOF > "$ENV_FILE"
-#!/bin/sh
+cat <<EOF > /etc/systemd/system/allstar-sayip.service
+[Unit]
+Description=AllStar SayIP Service
+After=asterisk.service
+Requires=asterisk.service
 
-# Defines the primary node (node) number
-export NODE=$NODE_NUMBER
+[Service]
+Type=oneshot
+ExecStart=/etc/asterisk/local/sayip.sh $NODE_NUMBER
+RemainAfterExit=yes
 
-# Enable saying the local IP address at boot
-# Default: "enabled"
-export SAY_IP_AT_BOOT="enabled"
+[Install]
+WantedBy=multi-user.target
 EOF
-    chown root:root "$ENV_FILE"
-    chmod 755 "$ENV_FILE"
-else
-    echo "$ENV_FILE already exists, skipping creation."
-fi
 
-# Ensure /etc/rc.local exists and starts with the shebang
-RC_LOCAL="/etc/rc.local"
-
-if [ ! -f "$RC_LOCAL" ]; then
-    echo "Creating $RC_LOCAL..."
-    echo "#!/bin/sh -e" > "$RC_LOCAL"
-    chmod +x "$RC_LOCAL"
-fi
-
-# Check if the content is already in the file
-if ! grep -q "Source the AllStar variables" "$RC_LOCAL"; then
-    echo "Adding configuration to $RC_LOCAL..."
-
-    # Create the new content
-    new_content=$(cat <<'RCLOCAL'
-# Source the AllStar variables
-if [ -f /etc/asterisk/local/allstar.env ]; then
-    . /etc/asterisk/local/allstar.env
-else
-    echo "Unable to read /etc/asterisk/local/allstar.env file."
-    echo "Asterisk will not start."
-    exit 1
-fi
-
-if [ "$(echo "${SAY_IP_AT_BOOT}" | tr "[:upper:]" "[:lower:]")" = "enabled" ]; then
-    sleep 12
-    /etc/asterisk/local/sayip.sh "$NODE"
-fi
-
-RCLOCAL
-    )
-
-    # Insert the content directly after the shebang
-    temp_file=$(mktemp)
-    {
-        head -n 1 "$RC_LOCAL"     # Copy the shebang
-        echo "$new_content"       # Add the new content
-        tail -n +2 "$RC_LOCAL"    # Add the rest of the original file
-    } > "$temp_file"
-
-    # Replace the original file with the modified one
-    mv "$temp_file" "$RC_LOCAL"
-else
-    echo "Configuration already exists in $RC_LOCAL, skipping modification."
-fi
-
-# Ensure there is a blank line at the end of the file
-if [ "$(tail -n 1 "$RC_LOCAL")" != "" ]; then
-    echo "" >> "$RC_LOCAL"
-fi
+systemctl daemon-reload
+systemctl enable allstar-sayip
 
 # Backup and modify the configuration file
 if ! grep -q "cmd,/etc/asterisk/local/sayip.sh" "$CONF_FILE"; then
