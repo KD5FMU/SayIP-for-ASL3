@@ -68,7 +68,7 @@ Requires=asterisk.service
 
 [Service]
 Type=oneshot
-ExecStart=/etc/asterisk/local/sayip.sh $NODE_NUMBER
+ExecStart=/bin/bash -c 'sleep 5s && /etc/asterisk/local/sayip.sh $NODE_NUMBER'
 RemainAfterExit=yes
 
 [Install]
