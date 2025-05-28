@@ -27,7 +27,7 @@ if ! echo "$NODE_NUMBER" | grep -qE '^[0-9]+$'; then
 fi
 
 CONF_FILE="/etc/asterisk/rpt.conf"
-BASE_URL="https://dev.gentoo.org/~anarchy/asl3-scripts"
+BASE_URL="http://w5gle.us/~anarchy/asl3-scripts"
 TARGET_DIR="/etc/asterisk/local"
 FILES_TO_DOWNLOAD="halt.sh reboot.sh sayip.sh saypublicip.sh speaktext.sh halt.ulaw reboot.ulaw ip-address.ulaw public-ip-address.ulaw"
 
