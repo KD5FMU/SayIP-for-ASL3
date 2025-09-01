@@ -43,6 +43,24 @@ sudo ./asl3_sayip_reboot_halt.sh YOUR_NODE_NUMBER
 ```
 If you do not wish to have your node speak its Local IP address upon boot you can simply disable it
 ```
+
+👉 If you want to help Jory out with his efforts on making things better for all of us then please consider makeing a donation to his efforts.🇺🇸
+---
+<a href="https://www.paypal.com/donate?token=IyATJ7p91vnH0tLglypNy2DxIZ3G2VmpWddIzltxRzY4kpcF0hPRHPj7F9ipe3YvfujL-1een4QH5Te5" target="_blank">
+  <img src="https://img.shields.io/badge/Donate%20with-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" />
+</a>
+
+<a href="https://cash.app/$anarchpeng" target="_blank">
+  <img src="https://img.shields.io/badge/Donate-CashApp-00C244?style=for-the-badge&logo=cashapp&logoColor=white" />
+</a>
+
+<!-- Zelle uses email/phone inside your bank app; no public pay URL exists. -->
+<a href="mailto:geekypenguin@gmail.com?subject=Zelle%20Donation%20for%20Jory%20Pratt%20-%20W5GLE&body=I%27d%20like%20to%20send%20a%20Zelle%20donation.">
+  <img src="https://img.shields.io/badge/Donate%20via-Zelle-6D1E72?style=for-the-badge&logo=zelle&logoColor=white" />
+</a>
+
+**Send via Zelle to:** `geekypenguin@gmail.com` (Jory Pratt – W5GLE)
+
 sudo systemctl disable allstar-sayip
 ```
 
